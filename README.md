@@ -260,8 +260,6 @@ Deploy frontend using:
 Deploy backend using:
 
 * Railway
-  or
-* Render
 
 ---
 
