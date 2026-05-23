@@ -1,46 +1,64 @@
+import sys
+import os
 import time
 import logging
 from datetime import datetime
-# Assuming existing producer and scraper imports from your project
-# from kafka_producer import push_to_kafka
-# from scraper import fetch_latest_ai_tools
 
-# Configure Logging
+# ── Path setup: allow importing from the ai-bulletin directory ──────────────
+AI_BULLETIN_PATH = os.path.join(os.path.dirname(__file__), '..', 'ai-bulletin')
+if AI_BULLETIN_PATH not in sys.path:
+    sys.path.insert(0, os.path.abspath(AI_BULLETIN_PATH))
+
+from pipeline import run_fetch_and_save   # fetch from Product Hunt + save to Supabase
+
+# ── Configure Logging ───────────────────────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - [LIVE TECH] - %(levelname)s - %(message)s'
 )
 
+# ── Config ──────────────────────────────────────────────────────────────────
+POLL_INTERVAL_SECONDS = 300   # 5 minutes between cycles
+RETRY_INTERVAL_SECONDS = 60   # wait 60 s after an error before retrying
+
+
 def run_realtime_scheduler():
     logging.info("🚀 LIVE TECH Real-time Scheduler Started")
-    logging.info("📡 Monitoring AI innovation pipeline every 5 minutes...")
+    logging.info(f"📡 Polling Product Hunt every {POLL_INTERVAL_SECONDS // 60} minutes...")
 
     while True:
         try:
             start_time = datetime.now()
-            logging.info(f"🔄 Starting Discovery Cycle: {start_time.strftime('%H:%M:%S')}")
+            logging.info(f"🔄 Discovery Cycle started at {start_time.strftime('%H:%M:%S')}")
 
-            # 1. Fetch latest tools (Mocking the fetch process)
-            # tools = fetch_latest_ai_tools()
-            logging.info("🔎 Scraping latest AI tools from sources...")
-            
-            # 2. Push to Kafka (Mocking the push process)
-            # if tools:
-            #     push_to_kafka(tools)
-            #     logging.info(f"✅ Successfully pushed {len(tools)} tools to Kafka pipeline")
-            # else:
-            #     logging.info("ℹ️ No new tools found in this cycle.")
+            # ── 1. Fetch AI tools from Product Hunt & save to Supabase ──────
+            logging.info("🔎 Fetching latest AI tools from Product Hunt...")
+            tools = run_fetch_and_save()
+
+            # ── 2. Push to Kafka in addition to Supabase ──
+            from producer import run_producer   # your Kafka producer helper
+            if tools:
+                run_producer(tools)
+                logging.info(f"✅ Pushed {len(tools)} tools to Kafka")
+            else:
+                logging.info("ℹ️  No new tools found in this cycle.")
 
             cycle_duration = (datetime.now() - start_time).total_seconds()
-            logging.info(f"✨ Cycle Complete ({cycle_duration:.2f}s). Sleeping for 5 minutes...")
-            
-            # Wait for 5 minutes
-            time.sleep(300)
+            logging.info(
+                f"✨ Cycle complete in {cycle_duration:.2f}s — "
+                f"sleeping {POLL_INTERVAL_SECONDS // 60} min..."
+            )
+            time.sleep(POLL_INTERVAL_SECONDS)
 
+        except KeyboardInterrupt:
+            logging.info("🛑 Scheduler stopped by user.")
+            break
         except Exception as e:
-            logging.error(f"❌ Error in discovery cycle: {str(e)}")
-            logging.info("🔄 Retrying in 60 seconds...")
-            time.sleep(60)
+            logging.error(f"❌ Error in discovery cycle: {e}", exc_info=True)
+            logging.info(f"🔄 Retrying in {RETRY_INTERVAL_SECONDS}s...")
+            time.sleep(RETRY_INTERVAL_SECONDS)
+
 
 if __name__ == "__main__":
     run_realtime_scheduler()
+

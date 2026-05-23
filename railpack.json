@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "packages": {
+    "node": "20",
+    "python": "3.11"
+  },
+  "buildAptPackages": ["gcc"],
+  "cmds": {
+    "install": "npm install && npm install --prefix backend && npm install --prefix ai-bulletin && pip install -r requirements.txt",
+    "build": ""
+  },
+  "deploy": {
+    "startCommand": "cd backend && node server.js"
+  }
+}

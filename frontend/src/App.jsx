@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from './services/supabaseClient';
 import Login from './pages/Login';
@@ -53,7 +53,7 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchUserData = async (userId) => {
+  const fetchUserData = useCallback(async (userId) => {
     try {
       setLoading(true);
       // Fetch profile
@@ -84,9 +84,9 @@ function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const toggleSaveTool = async (toolId) => {
+  const toggleSaveTool = useCallback(async (toolId) => {
     if (!session) return;
 
     const isSaved = savedToolIds.includes(toolId);
@@ -116,7 +116,7 @@ function App() {
         console.error('Error adding bookmark:', error);
       }
     }
-  };
+  }, [session, savedToolIds]);
 
   if (showLoader) {
     return (

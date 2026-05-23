@@ -1,0 +1,8 @@
+# Discovery Engine (ai-bulletin)
+node_modules/
+__pycache__/
+*.pyc
+.env
+.env.local
+.DS_Store
+data/

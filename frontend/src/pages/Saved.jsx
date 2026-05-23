@@ -58,13 +58,13 @@ export default function Saved({ savedToolIds, toggleSaveTool }) {
       </header>
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="glass-panel h-80 animate-pulse bg-white/5" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
+          {[1, 2, 3, 4].map(i => (
+            <LoaderCard key={i} />
           ))}
         </div>
       ) : tools.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
           <AnimatePresence mode="popLayout">
             {tools.map(tool => (
               <ToolCard 

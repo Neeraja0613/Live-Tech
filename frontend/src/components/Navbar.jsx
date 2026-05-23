@@ -60,7 +60,7 @@ export default function Navbar({ session, profile, searchTerm, setSearchTerm }) 
       </Link>
 
       {/* Interactive Search Bar */}
-      <div className="flex-1 flex items-center justify-center px-4">
+      <div className={`flex-1 flex items-center justify-center px-2 sm:px-4 ${isSearchExpanded ? 'absolute inset-x-0 mx-6 bg-darker sm:relative sm:inset-auto sm:mx-0' : ''}`}>
         <div className="relative flex items-center justify-center w-full max-w-xl">
           <AnimatePresence mode="wait">
             {!isSearchExpanded ? (
@@ -73,9 +73,6 @@ export default function Navbar({ session, profile, searchTerm, setSearchTerm }) 
                 className="p-2.5 rounded-full bg-white/5 border border-white/10 text-gray-400 hover:text-primary hover:border-primary/50 hover:bg-white/10 transition-all shadow-sm group relative"
               >
                 <Search className="h-5 w-5" />
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-darker border border-white/10 rounded text-[10px] font-bold text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                  Press <span className="text-primary">⌘K</span> to search
-                </div>
               </motion.button>
             ) : (
               <motion.div
@@ -106,13 +103,9 @@ export default function Navbar({ session, profile, searchTerm, setSearchTerm }) 
                       <X className="h-4 w-4" />
                     </button>
                   )}
-                  <div className="flex items-center gap-1 px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px] font-bold text-gray-500 mr-2">
-                    <Command className="h-3 w-3" />
-                    <span>K</span>
-                  </div>
                   <button 
                     onClick={() => setIsSearchExpanded(false)}
-                    className="px-4 py-1.5 bg-primary text-darker font-bold rounded-full text-xs hover:bg-white transition-all"
+                    className="px-3 sm:px-4 py-1.5 bg-primary text-darker font-bold rounded-full text-[10px] sm:text-xs hover:bg-white transition-all whitespace-nowrap"
                   >
                     Close
                   </button>

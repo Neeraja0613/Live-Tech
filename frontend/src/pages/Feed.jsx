@@ -84,7 +84,7 @@ export default function Feed({ session, searchTerm, setSearchTerm, savedToolIds,
     }
   }, [page]);
 
-  const fetchInitialTools = async () => {
+  const fetchInitialTools = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -102,9 +102,9 @@ export default function Feed({ session, searchTerm, setSearchTerm, savedToolIds,
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchMoreTools = async () => {
+  const fetchMoreTools = useCallback(async () => {
     if (fetchingMore || !hasMore) return;
     
     try {
@@ -134,13 +134,14 @@ export default function Feed({ session, searchTerm, setSearchTerm, savedToolIds,
     } finally {
       setFetchingMore(false);
     }
-  };
+  }, [fetchingMore, hasMore, page]);
 
   // Filtered tools based on search and category filter
   const processedTools = useMemo(() => {
+    const lowerSearch = searchTerm.toLowerCase();
     return tools.filter(tool => {
-      const matchesSearch = (tool.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-        (tool.tagline?.toLowerCase() || '').includes(searchTerm.toLowerCase());
+      const matchesSearch = (tool.name?.toLowerCase() || '').includes(lowerSearch) ||
+        (tool.tagline?.toLowerCase() || '').includes(lowerSearch);
 
       const topics = Array.isArray(tool.topics) ? tool.topics : tool.topics?.split(',') || [];
       const matchesFilter = activeFilter === 'All' || topics.some(t => t.trim() === activeFilter);
@@ -212,7 +213,7 @@ export default function Feed({ session, searchTerm, setSearchTerm, savedToolIds,
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-6xl md:text-7xl font-black text-white tracking-tighter mb-6 leading-[0.9]"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter mb-6 leading-[0.9]"
           >
             Live <span className="text-gradient">Trending</span> <br/>AI Discovery
           </motion.h2>
@@ -284,8 +285,8 @@ export default function Feed({ session, searchTerm, setSearchTerm, savedToolIds,
               </div>
 
               {loading ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {[1, 2, 3, 4, 5, 6].map(i => <LoaderCard key={i} />)}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map(i => <LoaderCard key={i} />)}
                 </div>
               ) : error ? (
                 <div className="glass-panel py-32 text-center border-red-500/10">
@@ -302,7 +303,7 @@ export default function Feed({ session, searchTerm, setSearchTerm, savedToolIds,
                 </div>
               ) : processedTools.length > 0 ? (
                 <>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
                     <AnimatePresence mode="popLayout">
                       {processedTools.map((tool, index) => (
                         <motion.div
@@ -347,7 +348,7 @@ export default function Feed({ session, searchTerm, setSearchTerm, savedToolIds,
       {/* Detail Modal */}
       <AnimatePresence>
         {selectedTool && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-hidden">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -363,21 +364,21 @@ export default function Feed({ session, searchTerm, setSearchTerm, savedToolIds,
               className="relative w-full max-w-3xl glass-panel bg-card border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col max-h-[90vh]"
             >
               {/* Modal Header */}
-              <div className="p-8 border-b border-white/5 flex justify-between items-start bg-gradient-to-br from-primary/5 to-transparent">
-                <div className="flex gap-6">
-                  <div className="h-20 w-20 rounded-3xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-[0_0_30px_var(--color-primary-glow)] shrink-0">
-                    <Info className="h-10 w-10 text-darker" />
+              <div className="p-5 sm:p-8 border-b border-white/5 flex justify-between items-start bg-gradient-to-br from-primary/5 to-transparent">
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                  <div className="h-14 w-14 sm:h-20 sm:w-20 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-[0_0_30px_var(--color-primary-glow)] shrink-0">
+                    <Info className="h-7 w-7 sm:h-10 sm:w-10 text-darker" />
                   </div>
                   <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-4xl font-black text-white tracking-tighter leading-none">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+                      <h3 className="text-2xl sm:text-4xl font-black text-white tracking-tighter leading-none">
                         {selectedTool.name}
                       </h3>
                       {selectedTool.trending_score > 80 && (
-                        <span className="px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-[10px] font-black text-primary uppercase tracking-widest">🔥 Trending</span>
+                        <span className="px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-primary/20 border border-primary/30 text-[8px] sm:text-[10px] font-black text-primary uppercase tracking-widest">🔥 Trending</span>
                       )}
                     </div>
-                    <p className="text-primary font-bold text-base uppercase tracking-[0.2em]">
+                    <p className="text-primary font-bold text-sm sm:text-base uppercase tracking-[0.2em]">
                       {selectedTool.tagline}
                     </p>
                   </div>
@@ -391,8 +392,8 @@ export default function Feed({ session, searchTerm, setSearchTerm, savedToolIds,
               </div>
 
               {/* Modal Content */}
-              <div className="p-8 overflow-y-auto custom-scrollbar">
-                <div className="grid md:grid-cols-3 gap-10">
+              <div className="p-4 sm:p-6 md:p-8 overflow-y-auto custom-scrollbar">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
                   <div className="md:col-span-2">
                     <h4 className="text-xs font-black text-gray-500 uppercase tracking-[0.3em] mb-6">Discovery Insight</h4>
                     <p className="text-gray-300 leading-relaxed text-xl font-medium whitespace-pre-wrap">

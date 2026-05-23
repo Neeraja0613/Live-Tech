@@ -19,7 +19,7 @@ body {
 }
 
 .glass-panel {
-  @apply bg-card backdrop-blur-xl border border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.1)] rounded-2xl;
+  @apply bg-card backdrop-blur-md transform-gpu will-change-transform border border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.1)] rounded-2xl;
 }
 
 .glass-panel:hover {
